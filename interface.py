@@ -1,6 +1,4 @@
-import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import *
 from aircraft import *
 from flight import *
 from airline import *
@@ -9,30 +7,17 @@ aircrafts = []
 flights = []
 
 
-# ---------- AIRCRAFT FUNCTIONS ----------
+# ---------- AIRCRAFTS ----------
 def ShowAircrafts():
-    listAircrafts.delete(0, tk.END)
+    text = ""
     i = 0
     while i < len(aircrafts):
-        a = aircrafts[i]
-        listAircrafts.insert(tk.END, a.callsign + " " + a.type + " " + str(a.capacity))
+        text = text + aircrafts[i].callsign + " " + aircrafts[i].type + " " + str(aircrafts[i].capacity) + "\n"
         i = i + 1
+    aircraftsLabel.config(text=text)
 
 
-
-# ---------- FLIGHT FUNCTIONS ----------
-def ShowFlights():
-    listFlights.delete(0, tk.END)
-    i = 0
-    while i < len(flights):
-        f = flights[i]
-        text = f.id + " " + f.departure_airport + " " + f.arrival_airport
-        text = text + " " + f.departure_time + " " + f.arrival_time
-        text = text + " " + str(f.passengers)
-        listFlights.insert(tk.END, text)
-        i = i + 1
-
-def LoadA():
+def LoadAClick():
     loaded = LoadAircrafts("Aircrafts.txt")
     i = 0
     while i < len(loaded):
@@ -41,23 +26,37 @@ def LoadA():
     ShowAircrafts()
 
 
-def AddA():
-    parts = entryA.get().split()
+def AddAClick():
+    parts = aircraftEntry.get().split()
     if len(parts) == 3:
-        AddAircraft(aircrafts, Aircraft(parts[0], parts[1], int(parts[2])))
+        aircraft = Aircraft(parts[0], parts[1], int(parts[2]))
+        AddAircraft(aircrafts, aircraft)
     ShowAircrafts()
 
 
-def RemoveA():
-    RemoveAircraft(aircrafts, entryA.get())
+def RemoveAClick():
+    RemoveAircraft(aircrafts, aircraftEntry.get())
     ShowAircrafts()
 
 
-def SaveA():
+def SaveAClick():
     SaveAircrafts(aircrafts, "aircrafts_saved.txt")
 
-def LoadF():
-    loaded = LoadFlights("Flights.txt")
+
+# ---------- FLIGHTS ----------
+def ShowFlights():
+    text = ""
+    i = 0
+    while i < len(flights):
+        f = flights[i]
+        text = text + f.id + " " + f.DepartureAirport + " " + f.ArrivalAirport + " "
+        text = text + f.DepartureTime + " " + f.ArrivalTime + " " + str(f.passengers) + "\n"
+        i = i + 1
+    flightsLabel.config(text=text)
+
+
+def LoadFClick():
+    loaded = LoadFlights("operations.txt")
     i = 0
     while i < len(loaded):
         AddFlight(flights, loaded[i])
@@ -65,53 +64,88 @@ def LoadF():
     ShowFlights()
 
 
-def AddF():
-    p = entryF.get().split()              # "A99 LEBL LEMD 10:30 11:45 150"
+def AddFClick():
+    p = flightEntry.get().split()
     if len(p) == 6:
-        AddFlight(flights, Flight(p[0], p[1], p[2], p[3], p[4], int(p[5])))
+        flight = Flight(p[0], p[3], p[4], p[1], p[2], int(p[5]))
+        AddFlight(flights, flight)
     ShowFlights()
 
 
-def RemoveF():
-    RemoveFlight(flights, entryF.get())
+def RemoveFClick():
+    RemoveFlight(flights, flightEntry.get())
     ShowFlights()
 
 
-def SaveF():
+def SaveFClick():
     SaveFlights(flights, "flights_saved.txt")
 
 
-def Plot():
+
+def PlotClick():
     airline = Airline("Vueling", aircrafts, flights)
     PlotFlights(airline)
 
 
 # ---------- WINDOW ----------
-window = tk.Tk()
+window = Tk()
 window.title("Airline")
+window.geometry("800x600")
+window.rowconfigure(0, weight=1)
+window.rowconfigure(1, weight=1)
+window.rowconfigure(2, weight=6)
+window.rowconfigure(3, weight=1)
+window.rowconfigure(4, weight=1)
+window.rowconfigure(5, weight=1)
+window.rowconfigure(6, weight=1)
+window.columnconfigure(0, weight=1)
+window.columnconfigure(1, weight=1)
+window.columnconfigure(2, weight=1)
+window.columnconfigure(3, weight=1)
 
-tk.Label(window, text="AIRCRAFTS").pack()
-listAircrafts = tk.Listbox(window, width=50)
-listAircrafts.pack()
-tk.Label(window, text="Add: callsign type capacity.  Remove: callsign").pack()
-entryA = tk.Entry(window, width=50)
-entryA.pack()
-tk.Button(window, text="Load aircrafts", command=LoadA).pack()
-tk.Button(window, text="Add aircraft", command=AddA).pack()
-tk.Button(window, text="Remove aircraft", command=RemoveA).pack()
-tk.Button(window, text="Save aircrafts", command=SaveA).pack()
+titleLabel = Label(window, text="Airline", font=("Courier", 20, "italic"))
+titleLabel.grid(row=0, column=0, columnspan=4, padx=5, pady=5, sticky=N + S + E + W)
 
-tk.Label(window, text="FLIGHTS").pack()
-listFlights = tk.Listbox(window, width=50)
-listFlights.pack()
-tk.Label(window, text="Add: id from to departure arrival passengers.  Remove: id").pack()
-entryF = tk.Entry(window, width=50)
-entryF.pack()
-tk.Button(window, text="Load flights", command=LoadF).pack()
-tk.Button(window, text="Add flight", command=AddF).pack()
-tk.Button(window, text="Remove flight", command=RemoveF).pack()
-tk.Button(window, text="Save flights", command=SaveF).pack()
+# aircrafts part (left)
+aircraftsTitle = Label(window, text="AIRCRAFTS")
+aircraftsTitle.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky=N + S + E + W)
 
-tk.Button(window, text="Plot flights per hour", command=Plot).pack()
+aircraftsLabel = Label(window, text="", bg="white", justify=LEFT)
+aircraftsLabel.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky=N + S + E + W)
+
+aircraftEntry = Entry(window)
+aircraftEntry.grid(row=3, column=0, columnspan=2, padx=5, pady=5, sticky=N + S + E + W)
+
+LoadAButton = Button(window, text="Load", bg='green', fg="white", command=LoadAClick)
+LoadAButton.grid(row=4, column=0, padx=5, pady=5, sticky=N + S + E + W)
+AddAButton = Button(window, text="Add", bg='green', fg="white", command=AddAClick)
+AddAButton.grid(row=4, column=1, padx=5, pady=5, sticky=N + S + E + W)
+RemoveAButton = Button(window, text="Remove", bg='green', fg="white", command=RemoveAClick)
+RemoveAButton.grid(row=5, column=0, padx=5, pady=5, sticky=N + S + E + W)
+SaveAButton = Button(window, text="Save", bg='green', fg="white", command=SaveAClick)
+SaveAButton.grid(row=5, column=1, padx=5, pady=5, sticky=N + S + E + W)
+
+
+flightsTitle = Label(window, text="FLIGHTS")
+flightsTitle.grid(row=1, column=2, columnspan=2, padx=5, pady=5, sticky=N + S + E + W)
+
+flightsLabel = Label(window, text="", bg="white", justify=LEFT)
+flightsLabel.grid(row=2, column=2, columnspan=2, padx=5, pady=5, sticky=N + S + E + W)
+
+flightEntry = Entry(window)
+flightEntry.grid(row=3, column=2, columnspan=2, padx=5, pady=5, sticky=N + S + E + W)
+
+LoadFButton = Button(window, text="Load", bg='green', fg="white", command=LoadFClick)
+LoadFButton.grid(row=4, column=2, padx=5, pady=5, sticky=N + S + E + W)
+AddFButton = Button(window, text="Add", bg='green', fg="white", command=AddFClick)
+AddFButton.grid(row=4, column=3, padx=5, pady=5, sticky=N + S + E + W)
+RemoveFButton = Button(window, text="Remove", bg='green', fg="white", command=RemoveFClick)
+RemoveFButton.grid(row=5, column=2, padx=5, pady=5, sticky=N + S + E + W)
+SaveFButton = Button(window, text="Save", bg='green', fg="white", command=SaveFClick)
+SaveFButton.grid(row=5, column=3, padx=5, pady=5, sticky=N + S + E + W)
+
+
+PlotButton = Button(window, text="Plot flights per hour", bg='grey', fg="black", command=PlotClick)
+PlotButton.grid(row=6, column=0, columnspan=4, padx=5, pady=5, sticky=N + S + E + W)
 
 window.mainloop()

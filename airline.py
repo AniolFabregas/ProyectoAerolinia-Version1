@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from aircraft import *
+from flight import *
 
 class Airline:
     def __init__(self, name, fleet, operations):
@@ -21,26 +23,24 @@ def PlotFlights(airline):
     h = 0
     while h < 24:
         hours.append(h)
-        counts.append(0)  # at the start, 0 flights in every hour
+        counts.append(0)
         h = h + 1
 
     i = 0
     while i < len(airline.operations):
         flight = airline.operations[i]
-        departure = TimeToMinutes(flight.departure_time)
-        arrival = TimeToMinutes(flight.arrival_time)
+        departure = TimeToMinutes(flight.DepartureTime)
+        arrival = TimeToMinutes(flight.ArrivalTime)
 
         h = 0
         while h < 24:
-            # the flight is on air in hour h if it takes off before the hour ends
-            # and lands after the hour starts
+
             if departure < (h + 1) * 60 and arrival > h * 60:
                 counts[h] = counts[h] + 1
             h = h + 1
         i = i + 1
 
     plt.bar(hours, counts)
-    plt.xticks(hours)
     plt.xlabel("Hour")
     plt.ylabel("Flights on air")
     plt.title("Flights on air in every hour")

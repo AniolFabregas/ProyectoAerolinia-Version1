@@ -36,11 +36,13 @@ def LoadFlights(filename):
     lines = file.readlines()
     file.close()
 
-    i = 1                       # skip the header line
+    i = 1
     while i < len(lines):
         parts = lines[i].split()
         if len(parts) == 6:
-            flight = Flight(parts[0], parts[1], parts[2], parts[3], parts[4], int(parts[5]))
+            # fitxer: 0=ID  1=hora sortida  2=hora arribada  3=aeroport sortida  4=aeroport arribada  5=passatgers
+            # Flight(ID, DepartureAirport, ArrivalAirport, DepartureTime, ArrivalTime, Passengers)
+            flight = Flight(parts[0], parts[3], parts[4], parts[1], parts[2], int(parts[5]))
             flights.append(flight)
         i = i + 1
     return flights
@@ -51,8 +53,8 @@ def SaveFlights(flights, filename):
     i = 0
     while i < len(flights):
         f = flights[i]
-        line = f.id + " " + f.departure_airport + " " + f.arrival_airport
-        line = line + " " + f.departure_time + " " + f.arrival_time
+        line = f.id + " " + f.DepartureTime + " " + f.ArrivalTime
+        line = line + " " + f.DepartureAirport + " " + f.ArrivalAirport
         line = line + " " + str(f.passengers) + "\n"
         file.write(line)
         i = i + 1

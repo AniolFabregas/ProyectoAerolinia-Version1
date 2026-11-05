@@ -17,7 +17,7 @@ def LoadAircrafts(filename):
         try:
             file = open(filename, "r")
         except:
-            return aircrafts  # the file does not exist, so return an empty list
+            return aircrafts
 
         lines = file.readlines()
         file.close()
