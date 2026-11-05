@@ -10,9 +10,11 @@ class Airline:
 
 
 def PrintAirline(airline):
-    print(airline.name)
-    print(airline.fleet)
-    print(airline.operations)
+    print("Airline:", airline.name)
+    print("Fleet:")
+    PrintAircrafts(airline.fleet)
+    print("Operations:")
+    PrintFlights(airline.operations)
 
 
 
@@ -28,14 +30,15 @@ def PlotFlights(airline):
 
     i = 0
     while i < len(airline.operations):
-        flight = airline.operations[i]
+        flight = airline.operations[i]  # aquesta línia és la que falta
         departure = TimeToMinutes(flight.DepartureTime)
-        arrival = TimeToMinutes(flight.ArrivalTime)
+        arrival = departure + FlightDuration(flight)
 
         h = 0
         while h < 24:
-
             if departure < (h + 1) * 60 and arrival > h * 60:
+                counts[h] = counts[h] + 1
+            if arrival > 1440 and arrival - 1440 > h * 60:
                 counts[h] = counts[h] + 1
             h = h + 1
         i = i + 1
@@ -48,8 +51,6 @@ def PlotFlights(airline):
 
 # test section
 if __name__ == "__main__":
-    from aircraft import *
-    from flight import *
 
     aircrafts = []
     aircrafts.append(Aircraft("AAAA", "A220-100", 135))
@@ -61,6 +62,10 @@ if __name__ == "__main__":
 
     airline = Airline("Vueling", aircrafts, flights)
     PrintAirline(airline)
-
+    aircrafts = LoadAircrafts("Aircrafts.txt")
+    flights = LoadFlights("operations.txt")
+    airline = Airline("Vueling", aircrafts, flights)
+    PrintAirline(airline)
+    PlotFlights(airline)
 
 

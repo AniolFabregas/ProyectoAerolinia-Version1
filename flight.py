@@ -23,7 +23,11 @@ def TimeToMinutes(time):
     return hours * 60 + minutes
 
 def FlightDuration(flight):
-    duration = TimeToMinutes(flight.ArrivalTime - flight.DepartureTime)
+    departure = TimeToMinutes(flight.DepartureTime)
+    arrival = TimeToMinutes(flight.ArrivalTime)
+    duration = arrival - departure
+    if duration < 0:                # el vol arriba l'endemà
+        duration = duration + 1440
     return duration
 
 def LoadFlights(filename):
@@ -36,14 +40,15 @@ def LoadFlights(filename):
     lines = file.readlines()
     file.close()
 
-    i = 1
+    i = 0
     while i < len(lines):
         parts = lines[i].split()
         if len(parts) == 6:
-            # fitxer: 0=ID  1=hora sortida  2=hora arribada  3=aeroport sortida  4=aeroport arribada  5=passatgers
-            # Flight(ID, DepartureAirport, ArrivalAirport, DepartureTime, ArrivalTime, Passengers)
-            flight = Flight(parts[0], parts[3], parts[4], parts[1], parts[2], int(parts[5]))
-            flights.append(flight)
+            try:
+                passengers = int(parts[5])
+                flights.append(Flight(parts[0], parts[3], parts[4], parts[1], parts[2], passengers))
+            except:
+                print("Line ignored:", lines[i])
         i = i + 1
     return flights
 
@@ -88,8 +93,8 @@ if __name__ == "__main__":
     PrintFlight(flight)
     print(FlightDuration(flight))
 
-if __name__ == "__main__":
-    flights = LoadFlights("Flights.txt")  # use the real name of your file
+
+    flights = LoadFlights("operations.txt")  # use the real name of your file
     PrintFlights(flights)
     AddFlight(flights, Flight("A99", "LEBL", "LEMD", "10:30", "11:45", 150))
     print(RemoveFlight(flights, "A99"))  # 0

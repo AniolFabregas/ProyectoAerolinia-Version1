@@ -13,23 +13,25 @@ def PrintAircraft(aircraft):
     print(aircraft.capacity)
 
 def LoadAircrafts(filename):
-        aircrafts = []
-        try:
-            file = open(filename, "r")
-        except:
-            return aircrafts
-
-        lines = file.readlines()
-        file.close()
-
-        i = 1
-        while i < len(lines):
-            parts = lines[i].split()
-            if len(parts) == 3:
-                aircraft = Aircraft(parts[0], parts[1], int(parts[2]))
-                aircrafts.append(aircraft)
-            i = i + 1
+    aircrafts = []
+    try:
+        file = open(filename, "r")
+    except:
         return aircrafts
+    lines = file.readlines()
+    file.close()
+
+    i = 0
+    while i < len(lines):
+        parts = lines[i].split()
+        if len(parts) == 3:
+            try:
+                capacity = int(parts[2])
+                aircrafts.append(Aircraft(parts[0], parts[1], capacity))
+            except:
+                print("Line ignored:", lines[i])
+        i = i + 1
+    return aircrafts
 
 def SaveAircrafts(aircrafts, filename):
         file = open(filename, "w")
@@ -61,3 +63,9 @@ def RemoveAircraft(aircrafts, callsign):
 if __name__ == "__main__":
     aircraft = Aircraft("AAAA", "A220-100", 135)
     PrintAircraft(aircraft)
+    aircrafts = LoadAircrafts("Aircrafts.txt")
+    PrintAircrafts(aircrafts)
+    AddAircraft(aircrafts, Aircraft("CCCC", "B737", 189))
+    print(RemoveAircraft(aircrafts, "CCCC"))  # 0
+    print(RemoveAircraft(aircrafts, "ZZZZ"))  # -1
+    SaveAircrafts(aircrafts, "aircrafts_saved.txt")

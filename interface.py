@@ -2,6 +2,7 @@ from tkinter import *
 from aircraft import *
 from flight import *
 from airline import *
+from tkinter import messagebox
 
 aircrafts = []
 flights = []
@@ -18,24 +19,31 @@ def ShowAircrafts():
 
 
 def LoadAClick():
-    loaded = LoadAircrafts("Aircrafts.txt")
-    i = 0
-    while i < len(loaded):
-        AddAircraft(aircrafts, loaded[i])
-        i = i + 1
+    global aircrafts  # així no es dupliquen si carregues dues vegades
+    aircrafts = LoadAircrafts("Aircrafts.txt")
+    if len(aircrafts) == 0:
+        messagebox.showerror("Error", "File not found or empty")
     ShowAircrafts()
 
 
 def AddAClick():
     parts = aircraftEntry.get().split()
-    if len(parts) == 3:
-        aircraft = Aircraft(parts[0], parts[1], int(parts[2]))
-        AddAircraft(aircrafts, aircraft)
+    if len(parts) != 3:
+        messagebox.showerror("Error", "Format: callsign type capacity")
+        return
+    try:
+        capacity = int(parts[2])
+    except:
+        messagebox.showerror("Error", "Capacity must be a number")
+        return
+    AddAircraft(aircrafts, Aircraft(parts[0], parts[1], capacity))
     ShowAircrafts()
 
 
 def RemoveAClick():
-    RemoveAircraft(aircrafts, aircraftEntry.get())
+    result = RemoveAircraft(aircrafts, aircraftEntry.get())
+    if result == -1:
+        messagebox.showerror("Error", "Callsign not found")
     ShowAircrafts()
 
 
@@ -56,24 +64,31 @@ def ShowFlights():
 
 
 def LoadFClick():
-    loaded = LoadFlights("operations.txt")
-    i = 0
-    while i < len(loaded):
-        AddFlight(flights, loaded[i])
-        i = i + 1
+    global flights
+    flights = LoadFlights("operations.txt")
+    if len(flights) == 0:
+        messagebox.showerror("Error", "File not found or empty")
     ShowFlights()
 
 
 def AddFClick():
     p = flightEntry.get().split()
-    if len(p) == 6:
-        flight = Flight(p[0], p[3], p[4], p[1], p[2], int(p[5]))
-        AddFlight(flights, flight)
+    if len(p) != 6:
+        messagebox.showerror("Error", "Format: id depTime arrTime depAirport arrAirport passengers")
+        return
+    try:
+        passengers = int(p[5])
+    except:
+        messagebox.showerror("Error", "Passengers must be a number")
+        return
+    AddFlight(flights, Flight(p[0], p[3], p[4], p[1], p[2], passengers))
     ShowFlights()
 
 
 def RemoveFClick():
-    RemoveFlight(flights, flightEntry.get())
+    result = RemoveFlight(flights, flightEntry.get())
+    if result == -1:
+        messagebox.showerror("Error", "Flight ID not found")
     ShowFlights()
 
 
@@ -83,14 +98,16 @@ def SaveFClick():
 
 
 def PlotClick():
+    if len(flights) == 0:
+        messagebox.showerror("Error", "Load the flights first")
+        return
     airline = Airline("Vueling", aircrafts, flights)
     PlotFlights(airline)
-
 
 # ---------- WINDOW ----------
 window = Tk()
 window.title("Airline")
-window.geometry("800x600")
+window.geometry("900x800")
 window.rowconfigure(0, weight=1)
 window.rowconfigure(1, weight=1)
 window.rowconfigure(2, weight=6)
